@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Calcola Fabbisogno</title>
+    <!-- Configurazione per iPhone / iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fabbisogno">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f2f2f7;
+            margin: 0;
+            padding: 20px;
+            color: #1c1c1e;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #3a3a3c;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #c7c7cc;
+            border-radius: 10px;
+            background-color: #f9f9fb;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="number"]:focus, select:focus {
+            border-color: #007aff;
+            background-color: #ffffff;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 6px;
+        }
+
+        .radio-group label {
+            font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+
+        button:active {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: #e5f1ff;
+            border-radius: 12px;
+            color: #004085;
+            font-size: 15px;
+            line-height: 1.5;
+            display: none;
+            white-space: pre-line;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calcolo Fabbisogno Calorico</h1>
+
+    <!-- Sesso -->
+    <div class="form-group">
+        <label>Sesso:</label>
+        <div class="radio-group">
+            <label><input type="radio" name="sesso" value="M" checked> Maschio</label>
+            <label><input type="radio" name="sesso" value="F"> Femmina</label>
+        </div>
+    </div>
+
+    <!-- Età -->
+    <div class="form-group">
+        <label for="eta">Età (anni):</label>
+        <input type="number" id="eta" placeholder="Es. 25">
+    </div>
+
+    <!-- Peso -->
+    <div class="form-group">
+        <label for="peso">Peso (kg):</label>
+        <input type="number" id="peso" placeholder="Es. 70">
+    </div>
+
+    <!-- Altezza -->
+    <div class="form-group">
+        <label for="altezza">Altezza (cm):</label>
+        <input type="number" id="altezza" placeholder="Es. 175">
+    </div>
+
+    <!-- Livello di Attività -->
+    <div class="form-group">
+        <label for="lvl_motorio">Livello di Attività:</label>
+        <select id="lvl_motorio">
+            <option value="1">(1) No sport</option>
+            <option value="2">2) 1-3 volte a settimana</option>
+            <option value="3">3) 3-5 giorni a settimana</option>
+            <option value="4">4) 6-7 giorni a settimana</option>
+            <option value="5">5) Atleta</option>
+        </select>
+    </div>
+
+    <!-- Bottone Calcola -->
+    <button onclick="calcolaFabbisogno()">Calcola Fabbisogno</button>
+
+    <!-- Risultato -->
+    <div id="tvRisultato" class="result"></div>
+</div>
+
+<script>
+    function calcolaFabbisogno() {
+        var strEta = document.getElementById("eta").value;
+        var strPeso = document.getElementById("peso").value;
+        var strAltezza = document.getElementById("altezza").value;
+
+        if (!strEta || !strPeso || !strAltezza) {
+            alert("Compila tutti i campi!");
+            return;
+        }
+
+        var eta = parseInt(strEta);
+        var peso = parseInt(strPeso);
+        var altezza = parseInt(strAltezza);
+        var lvl_motorio = parseInt(document.getElementById("lvl_motorio").value);
+
+        var sesso = document.querySelector('input[name="sesso"]:checked').value;
+
+        var bmr = 0;
+        var kcal = 0;
+
+        if (sesso === 'M') {
+            bmr = (10 * peso) + (6.25 * altezza) - (5 * eta) + 5;
+        } else if (sesso === 'F') {
+            bmr = (10 * peso) + (6.25 * altezza) - (5 * eta) - 161;
+        }
+
+        if (lvl_motorio === 1) {
+            kcal = bmr * 1.2;
+        } else if (lvl_motorio === 2) {
+            kcal = bmr * 1.375;
+        } else if (lvl_motorio === 3) {
+            kcal = bmr * 1.55;
+        } else if (lvl_motorio === 4) {
+            kcal = bmr * 1.725;
+        } else if (lvl_motorio === 5) {
+            kcal = bmr * 1.9;
+        }
+
+        var testoRisultato = "Secondo i dati da te forniti il tuo fabbisogno giornaliero è di " + kcal.toFixed(1) + " kcal\nQuantità di acqua consigliata: tra i " + (peso * 30) + " ml e i " + (peso * 35) + " ml";
+
+        var divRisultato = document.getElementById("tvRisultato");
+        divRisultato.innerText = testoRisultato;
+        divRisultato.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
